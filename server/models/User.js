@@ -36,6 +36,12 @@ const userSchema = new mongoose.Schema({
       ref: 'Course',
     },
   ],
+  token: {
+    type: String,
+  },
+  resetPasswordExpires: {
+    type: Date,
+  },
   image: {
     type: String,
     required: true,
