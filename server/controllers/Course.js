@@ -14,26 +14,35 @@ exports.createCourse = async (req, res) => {
       price,
       category,
       tag,
+      status,
+      instructions,
     } = req.body;
     //get thumbnail - file fetch
     const thumbnail = req.files.thumbnailImage;
     //validation
     if (
-      (!courseName,
-      !courseDescription,
-      !whatYouWillLearn,
-      !price,
-      !category,
-      !thumbnail)
+      !courseName ||
+      !courseDescription ||
+      !whatYouWillLearn ||
+      !price ||
+      !category ||
+      !thumbnail ||
+      !tag
     ) {
       return res.status(400).json({
         success: false,
         message: 'All fields are required',
       });
     }
+
+    if (!status || status === undefined) {
+      status = 'Draft';
+    }
     //instructor protected route - we fetch the userId
     const userId = req.user.id;
-    const instructorDetails = await User.findById(userId);
+    const instructorDetails = await User.findById(userId, {
+      accountType: 'Instructor',
+    });
 
     console.log(instructorDetails);
     if (!instructorDetails) {
@@ -65,6 +74,8 @@ exports.createCourse = async (req, res) => {
       category: categoryDetails._id,
       tag,
       thumbnail: thumbnailImage.secure_url,
+      status: status,
+      instructions: instructions,
     });
     //add course entry in user schema of instructor
     await User.findByIdAndUpdate(
